@@ -1,21 +1,16 @@
 version: '2.1'
 
+volumes:
+    data1: {}
+    data2: {}
+    data3: {}
+
 services:
 
     oklog1:
+        container_name: oklog1
         image: oklog
         command: [
-            "ingeststore",
-            "-api", "tcp://0.0.0.0:10000",
-            "-ingest.fast", "tcp://0.0.0.0:10001",
-            "-ingest.durable", "tcp://0.0.0.0:10002",
-            "-ingest.bulk", "tcp://0.0.0.0:10003",
-            "-cluster", "tcp://0.0.0.0:10009",
-            "-store.segment-target-size", "1000000",
-            "-store.segment-retain", "30m",
-            "-store.segment-purge", "5m",
-            "-ingest.path", "/data/ingest",
-            "-store.path", "/data/store",
             "-peer", "oklog2:10009",
             "-peer", "oklog3:10009"
         ]
@@ -25,21 +20,13 @@ services:
             - "10012:10002"
             - "10013:10003"
             - "10019:10009"
+        volumes:
+            - data1:/data
 
     oklog2:
+        container_name: oklog2
         image: oklog
         command: [
-            "ingeststore",
-            "-api", "tcp://0.0.0.0:10000",
-            "-ingest.fast", "tcp://0.0.0.0:10001",
-            "-ingest.durable", "tcp://0.0.0.0:10002",
-            "-ingest.bulk", "tcp://0.0.0.0:10003",
-            "-cluster", "tcp://0.0.0.0:10009",
-            "-store.segment-target-size", "1000000",
-            "-store.segment-retain", "30m",
-            "-store.segment-purge", "5m",
-            "-ingest.path", "/data/ingest",
-            "-store.path", "/data/store",
             "-peer", "oklog1:10009",
             "-peer", "oklog3:10009"
         ]
@@ -49,21 +36,13 @@ services:
             - "10022:10002"
             - "10023:10003"
             - "10029:10009"
+        volumes:
+            - data2:/data
 
     oklog3:
+        container_name: oklog3
         image: oklog
         command: [
-            "ingeststore",
-            "-api", "tcp://0.0.0.0:10000",
-            "-ingest.fast", "tcp://0.0.0.0:10001",
-            "-ingest.durable", "tcp://0.0.0.0:10002",
-            "-ingest.bulk", "tcp://0.0.0.0:10003",
-            "-cluster", "tcp://0.0.0.0:10009",
-            "-store.segment-target-size", "1000000",
-            "-store.segment-retain", "30m",
-            "-store.segment-purge", "5m",
-            "-ingest.path", "/data/ingest",
-            "-store.path", "/data/store",
             "-peer", "oklog1:10009",
             "-peer", "oklog2:10009"
         ]
@@ -73,6 +52,8 @@ services:
             - "10032:10002"
             - "10033:10003"
             - "10039:10009"
+        volumes:
+            - data3:/data
 
     logspout:
         image: gliderlabs/logspout

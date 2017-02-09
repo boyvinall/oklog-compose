@@ -1,3 +1,18 @@
 FROM alpine
-ADD oklog /
-ENTRYPOINT ["/oklog"]
+
+ADD oklog run.sh /
+
+ENV \
+    OKLOG_COMMAND=ingeststore \
+    OKLOG_API=tcp://0.0.0.0:10000 \
+    OKLOG_INGEST_FAST=tcp://0.0.0.0:10001 \
+    OKLOG_INGEST_DURABLE=tcp://0.0.0.0:10002 \
+    OKLOG_INGEST_BULK=tcp://0.0.0.0:10003 \
+    OKLOG_CLUSTER=tcp://0.0.0.0:10009 \
+    OKLOG_STORE_SEGMENT_TARGET_SIZE=1000000 \
+    OKLOG_STORE_SEGMENT_RETAIN=30m \
+    OKLOG_STORE_SEGMENT_PURGE=5m \
+    OKLOG_INGEST_PATH=/data/ingest \
+    OKLOG_STORE_PATH=/data/store
+
+ENTRYPOINT ["/run.sh"]
