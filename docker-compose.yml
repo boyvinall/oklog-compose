@@ -1,0 +1,84 @@
+version: '2.1'
+
+services:
+
+    oklog1:
+        image: oklog
+        command: [
+            "ingeststore",
+            "-api", "tcp://0.0.0.0:10000",
+            "-ingest.fast", "tcp://0.0.0.0:10001",
+            "-ingest.durable", "tcp://0.0.0.0:10002",
+            "-ingest.bulk", "tcp://0.0.0.0:10003",
+            "-cluster", "tcp://0.0.0.0:10009",
+            "-store.segment-target-size", "1000000",
+            "-store.segment-retain", "30m",
+            "-store.segment-purge", "5m",
+            "-ingest.path", "/data/ingest",
+            "-store.path", "/data/store",
+            "-peer", "oklog2:10009",
+            "-peer", "oklog3:10009"
+        ]
+        ports:
+            - "10010:10000"
+            - "10011:10001"
+            - "10012:10002"
+            - "10013:10003"
+            - "10019:10009"
+
+    oklog2:
+        image: oklog
+        command: [
+            "ingeststore",
+            "-api", "tcp://0.0.0.0:10000",
+            "-ingest.fast", "tcp://0.0.0.0:10001",
+            "-ingest.durable", "tcp://0.0.0.0:10002",
+            "-ingest.bulk", "tcp://0.0.0.0:10003",
+            "-cluster", "tcp://0.0.0.0:10009",
+            "-store.segment-target-size", "1000000",
+            "-store.segment-retain", "30m",
+            "-store.segment-purge", "5m",
+            "-ingest.path", "/data/ingest",
+            "-store.path", "/data/store",
+            "-peer", "oklog1:10009",
+            "-peer", "oklog3:10009"
+        ]
+        ports:
+            - "10020:10000"
+            - "10021:10001"
+            - "10022:10002"
+            - "10023:10003"
+            - "10029:10009"
+
+    oklog3:
+        image: oklog
+        command: [
+            "ingeststore",
+            "-api", "tcp://0.0.0.0:10000",
+            "-ingest.fast", "tcp://0.0.0.0:10001",
+            "-ingest.durable", "tcp://0.0.0.0:10002",
+            "-ingest.bulk", "tcp://0.0.0.0:10003",
+            "-cluster", "tcp://0.0.0.0:10009",
+            "-store.segment-target-size", "1000000",
+            "-store.segment-retain", "30m",
+            "-store.segment-purge", "5m",
+            "-ingest.path", "/data/ingest",
+            "-store.path", "/data/store",
+            "-peer", "oklog1:10009",
+            "-peer", "oklog2:10009"
+        ]
+        ports:
+            - "10030:10000"
+            - "10031:10001"
+            - "10032:10002"
+            - "10033:10003"
+            - "10039:10009"
+
+    logspout:
+        image: gliderlabs/logspout
+        command:
+            - "raw+tcp://oklog1:10001"
+        ports:
+            - "8000:80"
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
